@@ -1,1 +1,36 @@
-<p>user-list works!</p>
+<div class="max-w-6xl mx-auto">
+  <h2 class="text-2xl font-bold tracking-widest my-4 text-center text-[#014455]">
+    Usuarios VD Logistics
+  </h2>
+
+  @if (users$ | async) {
+  <div class="overflow-x-auto rounded-lg shadow">
+    <table class="min-w-full text-sm border border-slate-300 bg-white">
+      <thead>
+        <tr class="bg-[#014455] text-white text-left">
+          <th class="px-4 py-2">ID</th>
+          <th class="px-4 py-2">Nombre</th>
+          <th class="px-4 py-2">Tipo</th>
+          <th class="px-4 py-2">Teléfono</th>
+          <th class="px-4 py-2">Email</th>
+          <th class="px-4 py-2">Dirección</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-300">
+        @for (user of users$ | async; track user.id) {
+        <tr class="hover:bg-slate-100 text-left cursor-pointer">
+          <td class="px-4 py-3">{{ user.id }}</td>
+          <td class="px-4 py-3">{{ user.firstName }} {{ user.lastName }}</td>
+          <td class="px-4 py-3">{{ user.type }}</td>
+          <td class="px-4 py-3">{{ user.phone }}</td>
+          <td class="px-4 py-3">{{ user.email }}</td>
+          <td class="px-4 py-3">{{ user.address }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+
+  <ng-template #loading>Cargando usuarios...</ng-template>
+</div>

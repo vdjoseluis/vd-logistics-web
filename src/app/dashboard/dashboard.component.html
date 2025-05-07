@@ -1,9 +1,7 @@
-<div class="flex bg-slate-100 overflow-y-scroll w-screen h-screen">
-  <div class="flex relative w-screen">
-    <app-sidemenu />
+<div class="flex h-screen overflow-hidden">
+  <app-sidemenu class="w-64 shrink-0" />
 
-    <div class="px-2 mt-2 max-w-xl w-full m-auto">
-      <router-outlet />
-    </div>
+  <div class="flex-1 bg-slate-100 p-6 overflow-y-auto">
+    <router-outlet />
   </div>
 </div>
