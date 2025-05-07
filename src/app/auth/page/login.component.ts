@@ -30,6 +30,6 @@ export default class LoginComponent {
 
     this.authService.login(email!, password!)
       .then(() => this.router.navigate(['/dashboard/services']))
-      .catch(() => this.error = 'Credenciales inválidas');
+      .catch(() => this.error = 'Credenciales no válidas');
   }
 }

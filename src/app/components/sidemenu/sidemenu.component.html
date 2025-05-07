@@ -1,4 +1,4 @@
-<aside class="bg-[#014455] min-h-screen z-10 text-slate-100 w-64 right-0 h-screen overflow-y-scroll">
+<aside class="bg-[#014455] min-h-screen z-10 text-slate-100 w-64 left-0 h-screen fixed">
   <div class="my-4 px-6">
     <img src="logo.png" alt="Logo VD Logistics" class="w-26" aria-label="Logo VD Logistics">
   </div>
@@ -18,6 +18,6 @@
     }
   </ul>
   <hr> <br>
-  <span class="ps-2 text-sm">Usuario: N. Apellido1 Apellido2</span>
-  <button class="my-4 ms-4 px-4 py-1 rounded-lg bg-[#9dedce] text-[#014455] hover:bg-[#49717a] hover:text-[#9dedce]">Cerrar sesión</button>
+  <span class="ps-2 text-sm">Usuario: <strong>{{userName}}</strong></span>
+  <button (click)="logout()" class="my-4 ms-4 px-4 py-1 rounded-lg bg-[#9dedce] text-[#014455] hover:bg-[#49717a] hover:text-[#9dedce]">Cerrar sesión</button>
 </aside>
