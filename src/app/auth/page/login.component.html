@@ -1,0 +1,25 @@
+<section class="flex items-center justify-center w-full xl:max-w-[80%] h-screen m-auto shadow-2xl shadow-slate-500 rounded-b-3xl bg-slate-100">
+  <div class="flex flex-col items-center justify-center gap-10 w-[60%]">
+    <img src="logo.png" class="w-50"/>
+    <img src="imgLogin.png" class="w-120"/>
+  </div>
+  <div class="flex flex-col items-center justify-center w-[40%] h-full bg-[#014455] text-slate-100">
+    <h1 class="text-3xl font-bold tracking-widest mb-4">VD Logistics - Central</h1>
+    <form [formGroup]="form" (ngSubmit)="onLogin()" class="flex flex-col my-6 gap-6">
+        <div class="flex justify-between">
+          <label>Email:</label>
+          <input formControlName="email" type="email" class="bg-slate-200 text-[#014455] rounded-lg ms-4 py-1 px-4">
+        </div>
+        <div>
+          <label>Contraseña:</label>
+          <input formControlName="password" type="password" class="bg-slate-200 text-[#014455] rounded-lg ms-4 py-1 px-4">
+        </div>
+        @if (error) {
+          <div class="text-red-500">
+            {{error}}
+          </div>
+        }
+      <button type="submit" class="my-4 px-4 py-1 rounded-lg bg-[#9dedce] text-[#014455] hover:bg-[#49717a] hover:text-[#9dedce]">Iniciar Sesión</button>
+    </form>
+  </div>
+</section>
