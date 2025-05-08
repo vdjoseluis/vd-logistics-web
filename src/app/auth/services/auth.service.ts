@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from '@angular/fire/auth';
+import { Auth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from '@angular/fire/auth';
 import { doc, getDoc, Firestore } from '@angular/fire/firestore';
 
 @Injectable({
@@ -31,6 +31,12 @@ export class AuthService {
         unsub();
         resolve(!!user);
       });
+    });
+  }
+
+  createUserAuth(email: string, password: string): Promise<string> {
+    return createUserWithEmailAndPassword(this.auth, email, password).then((userCredential) => {
+      return userCredential.user.uid;
     });
   }
 }

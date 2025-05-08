@@ -9,12 +9,12 @@ import { Customer } from '../models/customer.model';
 export class IncidentsService {
   private firestore = inject(Firestore);
 
-  getIncidents(): Observable<any[]> {
+  getIncidents(status: string): Observable<any[]> {
     const colRef = collection(this.firestore, 'incidents');
 
     return collectionData(colRef, { idField: 'id' }).pipe(
       switchMap((incidents: any[]) => {
-        const filtered = incidents.filter(incident => incident.status === 'Pendiente');
+        const filtered = incidents.filter(incident => incident.status === status).sort((a, b) => a.date.toMillis() - b.date.toMillis());
 
         const incidentsWithRefs$ = filtered.map(async (incident) => {
           const serviceSnap = await getDoc(incident.refService);

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, collectionData, doc, getDoc } from '@angular/fire/firestore';
+import { DocumentReference, Firestore, collection, collectionData, doc, getDoc } from '@angular/fire/firestore';
 import { Observable, from, switchMap } from 'rxjs';
 import { User } from '../models/user.model';
 import { Customer } from '../models/customer.model';
@@ -12,7 +12,7 @@ export class ServicesService {
     const colRef = collection(this.firestore, 'services');
     return collectionData(colRef, { idField: 'id' }).pipe(
       switchMap((services: any[]) => {
-        const filtered = services.filter(s => s.status === status);
+        const filtered = services.filter(s => s.status === status).sort((a, b) => a.date.toMillis() - b.date.toMillis());
 
         const servicesWithRefs$ = filtered.map(async (s) => {
           const customerSnap = await getDoc(s.refCustomer);

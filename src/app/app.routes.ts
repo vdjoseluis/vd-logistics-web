@@ -63,7 +63,7 @@ export const routes: Routes = [
       },
       {
         path: 'logs',
-        title: 'Registros de Actividad',
+        title: 'Registro de Actividad',
         loadComponent: () => import('./components/logs/logs-list/logs-list.component')
       }
     ]

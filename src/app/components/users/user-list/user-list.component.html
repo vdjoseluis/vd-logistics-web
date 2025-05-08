@@ -1,9 +1,17 @@
 <section class="max-w-6xl mx-auto">
-  <h2
-    class="text-2xl font-bold tracking-widest my-4 text-center text-[#014455]"
-  >
+  <div class="flex justify-between items-center mt-6 mb-2">
+    <button
+      class="flex items-center bg-green-800 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+      [routerLink]="['/dashboard/user/new']"
+    >
+      <img src="newFile.svg" alt="Añadir" class="w-5 h-5 mr-2" />
+      Añadir Nuevo
+    </button>
+    <h2 class="text-2xl font-bold tracking-widest my-4 text-center">
     Usuarios VD Logistics
   </h2>
+  </div>
+  <hr class="my-4 border-slate-300">
 
   @if (isLoading) {
     <img src="spinner.gif" alt="Cargando ..." />
@@ -22,7 +30,7 @@
       </thead>
       <tbody class="divide-y divide-slate-300">
         @for (user of users | paginate: { itemsPerPage: 10, currentPage: currentPage }; track user.id) {
-        <tr class="hover:bg-slate-100 text-left cursor-pointer">
+        <tr class="hover:bg-slate-100 text-left cursor-pointer" (click)="goToEditUser(user.id)">
           <td class="px-4 py-3">{{ user.id }}</td>
           <td class="px-4 py-3">{{ user.firstName }} {{ user.lastName }}</td>
           <td class="px-4 py-3">{{ user.type }}</td>

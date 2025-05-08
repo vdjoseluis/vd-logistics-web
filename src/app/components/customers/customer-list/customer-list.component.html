@@ -1,9 +1,17 @@
 <section class="max-w-6xl mx-auto">
-  <h2
-    class="text-2xl font-bold tracking-widest my-4 text-center text-[#014455]"
-  >
-    Clientes VD Logistics
-  </h2>
+  <div class="flex justify-between items-center mt-6 mb-2">
+    <button
+      class="flex items-center bg-[#014455] text-white px-4 py-2 rounded hover:bg-[#026077] transition"
+      [routerLink]="['/dashboard/customer/new']"
+    >
+      <img src="newFile.svg" alt="Añadir" class="w-5 h-5 mr-2" />
+      Añadir Nuevo
+    </button>
+    <h2 class="text-2xl font-bold tracking-widest my-4 text-center">
+      Clientes VD Logistics
+    </h2>
+  </div>
+  <hr class="my-4 border-slate-300" />
 
   @if (isLoading) {
   <img src="spinner.gif" alt="Cargando ..." />

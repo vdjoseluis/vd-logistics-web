@@ -1,40 +1,71 @@
 <section class="max-w-6xl mx-auto">
-  <h2 class="text-2xl font-bold tracking-widest my-4 text-center">
-    Incidencias Pendientes
-  </h2>
+  <div class="flex justify-between items-center mt-6 mb-2">
+    <button
+      class="flex items-center bg-red-900 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+      [routerLink]="['/dashboard/services']"
+    >
+      <img src="newFile.svg" alt="Añadir" class="w-5 h-5 mr-2" />
+      Nueva Incidencia
+    </button>
+    <h2 class="text-2xl font-bold tracking-widest my-4 text-center">
+      Incidencias VD Logistics
+    </h2>
+  </div>
+  <hr class="my-4 border-slate-300" />
 
   @if (isLoading) {
   <img src="spinner.gif" alt="Cargando ..." />
   } @else {
-  <div class="overflow-x-auto rounded-lg shadow">
-    <table class="min-w-full text-sm border border-slate-300 bg-white">
-      <thead>
-        <tr class="bg-[#014455] text-white text-left">
-          <th class="px-4 py-2">ID</th>
-          <th class="px-4 py-2">Fecha</th>
-          <th class="px-4 py-2">Operario</th>
-          <th class="px-4 py-2">Cliente</th>
-          <th class="px-4 py-2">Descripción</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-300">
-        @for (incident of incidents| paginate: { itemsPerPage: 10, currentPage:
-        currentPage }; track incident.id) {
-        <tr class="hover:bg-slate-100 text-left cursor-pointer">
-          <td class="px-4 py-3">{{ incident.id }}</td>
-          <td class="px-4 py-3">{{ incident.dateFormatted }}</td>
-          <td class="px-4 py-3">{{ incident.operatorName }}</td>
-          <td class="px-4 py-3">{{ incident.customerName }}</td>
-          <td class="px-4 py-3">{{ incident.description }}</td>
-        </tr>
-        }
-      </tbody>
-    </table>
-    <pagination-controls
-      (pageChange)="currentPage = $event"
-      [autoHide]="true"
-      class="mt-4 flex justify-center"
-    />
-  </div>
-}
+  <mat-tab-group
+    (selectedIndexChange)="onTabChange($event)"
+    [selectedIndex]="activeTabIndex"
+  >
+    @for (status of statusTabs; track status) {
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span [ngClass]="activeTabIndex !== $index ? 'opacity-40' : ''">
+          {{ status.label }}
+        </span>
+      </ng-template>
+
+      @if (incidents.length) {
+      <div class="overflow-x-auto rounded-lg shadow">
+        <table class="min-w-full text-sm border border-slate-300 bg-white">
+          <thead>
+            <tr class="bg-[#014455] text-white text-left">
+              <th class="px-4 py-2">ID</th>
+              <th class="px-4 py-2">Fecha</th>
+              <th class="px-4 py-2">Operario</th>
+              <th class="px-4 py-2">Cliente</th>
+              <th class="px-4 py-2">Descripción</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-300">
+            @for (incident of incidents| paginate: { itemsPerPage: 10,
+            currentPage: currentPage }; track incident.id) {
+            <tr class="hover:bg-slate-100 text-left cursor-pointer">
+              <td class="px-4 py-3">{{ incident.id }}</td>
+              <td class="px-4 py-3">{{ incident.dateFormatted }}</td>
+              <td class="px-4 py-3">{{ incident.operatorName }}</td>
+              <td class="px-4 py-3">{{ incident.customerName }}</td>
+              <td class="px-4 py-3">{{ incident.description }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+        <pagination-controls
+          (pageChange)="currentPage = $event"
+          [autoHide]="true"
+          class="mt-4 flex justify-center"
+        />
+      </div>
+      } @else {
+      <p class="text-center text-gray-500 my-6">
+        No hay incidencias con estado: <strong>{{ status.status }}</strong>
+      </p>
+      }
+    </mat-tab>
+    }
+  </mat-tab-group>
+  }
 </section>
