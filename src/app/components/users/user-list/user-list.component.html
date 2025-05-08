@@ -1,9 +1,13 @@
-<div class="max-w-6xl mx-auto">
-  <h2 class="text-2xl font-bold tracking-widest my-4 text-center text-[#014455]">
+<section class="max-w-6xl mx-auto">
+  <h2
+    class="text-2xl font-bold tracking-widest my-4 text-center text-[#014455]"
+  >
     Usuarios VD Logistics
   </h2>
 
-  @if (users$ | async) {
+  @if (isLoading) {
+    <img src="spinner.gif" alt="Cargando ..." />
+    } @else {
   <div class="overflow-x-auto rounded-lg shadow">
     <table class="min-w-full text-sm border border-slate-300 bg-white">
       <thead>
@@ -17,7 +21,7 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-300">
-        @for (user of users$ | async; track user.id) {
+        @for (user of users | paginate: { itemsPerPage: 10, currentPage: currentPage }; track user.id) {
         <tr class="hover:bg-slate-100 text-left cursor-pointer">
           <td class="px-4 py-3">{{ user.id }}</td>
           <td class="px-4 py-3">{{ user.firstName }} {{ user.lastName }}</td>
@@ -29,8 +33,11 @@
         }
       </tbody>
     </table>
+    <pagination-controls
+      (pageChange)="currentPage = $event"
+      [autoHide]="true"
+      class="mt-4 flex justify-center"
+    />
   </div>
   }
-
-  <ng-template #loading>Cargando usuarios...</ng-template>
-</div>
+</section>
