@@ -87,7 +87,7 @@ export default class ServiceFormComponent implements OnInit {
       fileArray.push(this.fb.group({ name: fileName, url: fileUrl }));
     });
   }
-  
+
   // Validaciones y filtro para la fecha
   private readonly _currentDate = new Date();
   get minDate(): Date {
@@ -128,15 +128,9 @@ export default class ServiceFormComponent implements OnInit {
     window.open(URL.createObjectURL(file), '_blank');
   }
 
-  /* get operatorFiles() {
-    return ['archivo1.png', 'archivo2.png'];
-    //TODO: return this.servicesService.getOperatorFiles(this.serviceId);
-  } */
-
-  /* get sharedFiles() {
-    return ['archivo1.png', 'archivo2.png'];
-    //TODO: return this.servicesService.getSharedFiles(this.serviceId);
-  } */
+  onSelectService(serviceId: string, user: string) {
+    this.router.navigate(['/dashboard/incident', 'new'], { state: { serviceId, user } });
+  }
 
   onSubmit() {
     //TODO: Guardar servicio

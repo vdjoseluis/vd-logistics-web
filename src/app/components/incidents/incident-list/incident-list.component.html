@@ -2,7 +2,7 @@
   <div class="flex justify-between items-center mt-6 mb-2">
     <button
       class="flex items-center bg-red-900 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-      [routerLink]="['/dashboard/services']"
+      [routerLink]="['/dashboard/services']" [state]="{ fromIncidents: true }"
     >
       <img src="newFile.svg" alt="Añadir" class="w-5 h-5 mr-2" />
       Nueva Incidencia
@@ -43,7 +43,7 @@
           <tbody class="divide-y divide-slate-300">
             @for (incident of incidents| paginate: { itemsPerPage: 10,
             currentPage: currentPage }; track incident.id) {
-            <tr class="hover:bg-slate-100 text-left cursor-pointer">
+            <tr class="hover:bg-slate-100 text-left cursor-pointer" [routerLink]="['/dashboard/incident', incident.id]">
               <td class="px-4 py-3">{{ incident.id }}</td>
               <td class="px-4 py-3">{{ incident.dateFormatted }}</td>
               <td class="px-4 py-3">{{ incident.operatorName }}</td>

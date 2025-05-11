@@ -53,4 +53,5 @@ export default class IncidentListComponent implements OnInit {
     this.activeTabIndex = index;
     this.loadIncidentsForCurrentTab();
   }
+
 }

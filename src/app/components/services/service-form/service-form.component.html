@@ -62,9 +62,11 @@
     <div>
       <label class="block mb-1 text-sm font-medium">Estado</label>
       <select formControlName="status" class="w-full p-2 border rounded">
-        @for (status of status; track $index) {
-          <option value="{{ status }}">{{ status }}</option>
-        }
+        @if (!isEdit) {
+        <option value="Pendiente">Pendiente</option>
+        } @else { @for (status of status; track $index) {
+        <option value="{{ status }}">{{ status }}</option>
+        } }
       </select>
     </div>
 
@@ -72,6 +74,7 @@
       <label class="block mb-1 text-sm font-medium">Descripción</label>
       <textarea
         class="input"
+        style="resize: none"
         formControlName="description"
         rows="2"
         class="w-full p-2 border rounded"
@@ -82,7 +85,9 @@
       <label class="block mb-1 text-sm font-medium">Operario</label>
       <select formControlName="user" class="w-full p-2 border rounded">
         @for (op of operatorNames |async; track $index) {
-          <option value="{{ op.firstName }} {{ op.lastName }}">{{ op.firstName }} {{ op.lastName }}</option>
+        <option value="{{ op.firstName }} {{ op.lastName }}">
+          {{ op.firstName }} {{ op.lastName }}
+        </option>
         }
       </select>
     </div>
@@ -91,7 +96,9 @@
       <label class="block mb-1 text-sm font-medium">Cliente</label>
       <select formControlName="customer" class="w-full p-2 border rounded">
         @for (customer of customerNames |async; track $index) {
-          <option value="{{ customer.firstName }} {{ customer.lastName }}">{{ customer.firstName }} {{ customer.lastName }}</option>
+        <option value="{{ customer.firstName }} {{ customer.lastName }}">
+          {{ customer.firstName }} {{ customer.lastName }}
+        </option>
         }
       </select>
     </div>
@@ -100,6 +107,7 @@
       <label class="block mb-1 text-sm font-medium">Comentarios</label>
       <textarea
         class="input"
+        style="resize: none"
         formControlName="comments"
         rows="2"
         class="w-full p-2 border rounded"
@@ -117,10 +125,12 @@
           formControlName="sharedFiles"
         />
       </label>
-      <ul class="p-2 border rounded text-xs"> <!-- FALTA CARGAR Y ELIMINAR ARCHIVOS ADJUNTOS -->
+      <ul class="p-2 border rounded text-xs">
+        <!-- FALTA GUARDAR Y ELIMINAR EN STORAGE -->
         @for (file of serviceForm.get('sharedFiles')?.value; track $index) {
         <li
-          class="cursor-pointer hover:bg-slate-300 flex justify-between items-center" title="Click para descargar"
+          class="cursor-pointer hover:bg-slate-300 flex justify-between items-center"
+          title="Click para descargar"
         >
           <a [href]="file.url" target="_blank">{{ file.name }}</a>
           <button
@@ -139,10 +149,12 @@
       <label class="block mb-1 text-sm font-medium"
         >Añadidos por el operario</label
       >
-      <ul class="p-2 border rounded text-xs"> <!-- FALTA CARGAR, ELIMINAR Y DOBLE CLICK ARCHIVOS OPERARIO -->
+      <ul class="p-2 border rounded text-xs">
+        <!-- FALTA GUARDAR Y ELIMINAR EN STORAGE -->
         @for (file of serviceForm.get('operatorFiles')?.value; track $index) {
         <li
-          class="cursor-pointer hover:bg-slate-300 flex justify-between items-center" title="Click para descargar"
+          class="cursor-pointer hover:bg-slate-300 flex justify-between items-center"
+          title="Click para descargar"
         >
           <a [href]="file.url" target="_blank">{{ file.name }}</a>
           <button
@@ -165,6 +177,15 @@
       >
         Volver
       </button>
+      @if (isEdit) {
+      <button
+        class="bg-red-900 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+        (click)="onSelectService(serviceForm.get('id')?.value, serviceForm.get('user')?.value)"
+      >
+        Abrir Incidencia
+      </button>
+      }
+
       <button
         type="submit"
         class="bg-[#9dedce] text-[#014455] px-6 py-2 ms-2 rounded hover:bg-[#49717a] hover:text-[#9dedce]"

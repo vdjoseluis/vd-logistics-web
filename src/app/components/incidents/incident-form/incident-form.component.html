@@ -1,1 +1,85 @@
-<p>incident-form works!</p>
+<section
+  class="max-w-4xl mx-auto p-6 bg-slate-100 shadow-2xl rounded-xl shadow-slate-500"
+>
+  <h2 class="text-2xl font-bold tracking-widest mb-6 text-center">
+    {{ isEdit ? "Editar Incidencia" : "Nuevo Incidencia" }}
+  </h2>
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    class="grid grid-cols-2 gap-4"
+  >
+    @if (isEdit) {
+    <div>
+      <label class="block mb-1 text-sm font-medium">ID</label>
+      <input
+        formControlName="id"
+        class="w-full p-2 border rounded bg-gray-100"
+        readonly
+      />
+    </div>
+    }
+
+    <div>
+      <label class="block mb-1 text-sm font-medium">Fecha/Hora</label>
+      <span class="flex justify-between items-center">
+        <input
+          formControlName="date"
+          class="w-[45%] p-2 border rounded bg-gray-100"
+          readonly
+        />
+        <input
+          formControlName="time"
+          class="w-[45%] p-2 border rounded bg-gray-100"
+          readonly
+        />
+      </span>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-medium">Operario</label>
+      <input
+        formControlName="user"
+        class="w-full p-2 border rounded bg-gray-100"
+        readonly
+      />
+    </div>
+
+    <div class="col-span-2">
+      <label class="block mb-1 text-sm font-medium">Descripción</label>
+      <textarea autofocus
+        class="input"
+        style="resize: none;"
+        formControlName="description"
+        rows="2"
+        class="w-full p-2 border rounded"
+      ></textarea>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-medium">Servicio</label>
+      <input
+        formControlName="service"
+        class="w-full p-2 border rounded bg-gray-100"
+        readonly
+      />
+    </div>
+
+    <div class="col-span-2 text-center mt-4">
+      <button
+        type="button"
+        [routerLink]="['/dashboard/incidents']"
+        class="bg-[#014455] text-white px-6 py-2 me-2 rounded hover:bg-[#013344]"
+      >
+        Volver
+      </button>
+      <button
+        type="submit"
+        class="bg-[#9dedce] text-[#014455] px-6 py-2 ms-2 rounded hover:bg-[#49717a] hover:text-[#9dedce]"
+      >
+        {{ isEdit ? "Actualizar Incidencia" : "Crear Incidencia" }}
+      </button>
+    </div>
+  </form>
+</section>

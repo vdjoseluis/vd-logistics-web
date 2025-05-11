@@ -45,7 +45,7 @@
           <tbody class="divide-y divide-slate-300">
             @for ( service of services | paginate: { itemsPerPage: 10,
             currentPage: currentPage }; track service.id ) {
-            <tr class="hover:bg-slate-100 text-left cursor-pointer" [routerLink]="['/dashboard/service', service.id]">
+            <tr class="hover:bg-slate-100 text-left cursor-pointer" (click)="onSelectService(service.id, service.operatorName)">
               <td class="px-4 py-3">{{ service.id }}</td>
               <td class="px-4 py-3">{{ service.dateFormatted }}</td>
               <td class="px-4 py-3">{{ service.operatorName }}</td>

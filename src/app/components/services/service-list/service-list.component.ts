@@ -4,7 +4,9 @@ import { ServicesService } from '../../../services/services.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { Service } from '../../../models/service.model';
 import { MatTabsModule } from '@angular/material/tabs';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { user } from '@angular/fire/auth';
 
 type ExtendedService = Service & {
   id: string;
@@ -22,6 +24,24 @@ type ExtendedService = Service & {
 })
 export default class ServicesListComponent implements OnInit {
   private servicesService = inject(ServicesService);
+  private router = inject(Router);
+  private _snackBar = inject(MatSnackBar);
+
+  private fromIncidents = false;
+
+  constructor() {
+    const navigation = window.history.state;
+    this.fromIncidents = navigation['fromIncidents'];
+    if (this.fromIncidents) {
+      this.openSnackBar('---- Selecciona un servicio para la nueva incidencia ----', '');
+    }
+  }
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, {
+      duration: 5000,
+    });
+  }
 
   services: ExtendedService[] = [];
   statusTabs = [
@@ -54,6 +74,14 @@ export default class ServicesListComponent implements OnInit {
   onTabChange(index: number) {
     this.activeTabIndex = index;
     this.loadServicesForCurrentTab();
+  }
+
+  onSelectService(serviceId: string, user: string) {
+    if (this.fromIncidents) {
+      this.router.navigate(['/dashboard/incident', 'new'], { state: { serviceId, user } });
+    } else {
+      this.router.navigate(['/dashboard/service', serviceId]);
+    }
   }
 
 }

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, collectionData, doc, getDoc } from '@angular/fire/firestore';
-import { Observable, from, switchMap } from 'rxjs';
+import { Observable, from, map, of, switchMap } from 'rxjs';
 import { User } from '../models/user.model';
 import { Service } from '../models/service.model';
 import { Customer } from '../models/customer.model';
@@ -45,4 +45,36 @@ export class IncidentsService {
       })
     );
   }
+
+  getIncidentById(id: string): Observable<any> {
+  const docRef = doc(this.firestore, `incidents/${id}`);
+  return from(getDoc(docRef)).pipe(
+    switchMap((incidentSnap) => {
+      if (!incidentSnap.exists()) {
+        return of(null);
+      }
+
+      const incidentData = incidentSnap.data() as any;
+
+      return from(Promise.all([
+        incidentData.refService ? Promise.resolve(incidentData.refService.id) : Promise.resolve(null),
+        incidentData.refOperator ? getDoc(incidentData.refOperator) : Promise.resolve(null),
+      ])).pipe(
+        map(([serviceId, operatorSnap]) => {
+          const operatorData = operatorSnap?.data() as User;
+
+          return {
+            id: incidentSnap.id,
+            date: incidentData.date.toDate().toLocaleDateString(),
+            time: new Date(incidentData.date.toDate()).toLocaleTimeString(),
+            description: incidentData.description,
+            user: operatorData ? `${operatorData.firstName} ${operatorData.lastName}` : 'Desconocido',
+            service: serviceId ?? 'Desconocido', 
+          };
+        })
+      );
+    })
+  );
+}
+
 }
