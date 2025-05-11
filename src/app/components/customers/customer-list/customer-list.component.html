@@ -31,7 +31,7 @@
       <tbody class="divide-y divide-slate-300">
         @for (customer of customers| paginate: { itemsPerPage: 10, currentPage:
         currentPage }; track customer.id) {
-        <tr class="hover:bg-slate-100 text-left cursor-pointer">
+        <tr class="hover:bg-slate-100 text-left cursor-pointer" [routerLink]="['/dashboard/customer', customer.id]">
           <td class="px-4 py-3">{{ customer.id }}</td>
           <td class="px-4 py-3">
             {{ customer.firstName }} {{ customer.lastName }}

@@ -30,7 +30,7 @@
       </thead>
       <tbody class="divide-y divide-slate-300">
         @for (user of users | paginate: { itemsPerPage: 10, currentPage: currentPage }; track user.id) {
-        <tr class="hover:bg-slate-100 text-left cursor-pointer" (click)="goToEditUser(user.id)">
+        <tr class="hover:bg-slate-100 text-left cursor-pointer" [routerLink]="['/dashboard/user', user.id]">
           <td class="px-4 py-3">{{ user.id }}</td>
           <td class="px-4 py-3">{{ user.firstName }} {{ user.lastName }}</td>
           <td class="px-4 py-3">{{ user.type }}</td>

@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './user-form.component.html',
 })
 export default class UserFormComponent implements OnInit {
-  private fb = inject(FormBuilder);
+  private db = inject(FormBuilder);
   private usersService = inject(UsersService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
@@ -24,7 +24,7 @@ export default class UserFormComponent implements OnInit {
   userId: string = '';
 
   ngOnInit(): void {
-    this.form = this.fb.group({
+    this.form = this.db.group({
       id: [{ value: '', disabled: true }],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -48,6 +48,8 @@ export default class UserFormComponent implements OnInit {
               id,
               ...user,
             });
+          } else {
+            this.router.navigate(['/dashboard/users']);
           }
         });
       } else {

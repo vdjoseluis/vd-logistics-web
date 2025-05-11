@@ -55,4 +55,5 @@ export default class ServicesListComponent implements OnInit {
     this.activeTabIndex = index;
     this.loadServicesForCurrentTab();
   }
+
 }

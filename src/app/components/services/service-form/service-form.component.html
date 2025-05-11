@@ -1,1 +1,176 @@
-<p>service-form works!</p>
+<section
+  class="max-w-4xl mx-auto p-6 bg-slate-100 shadow-2xl rounded-xl shadow-slate-500"
+>
+  <h2 class="text-2xl font-bold tracking-widest mb-6 text-center">
+    {{ isEdit ? "Editar Servicio" : "Nuevo Servicio" }}
+  </h2>
+
+  <form
+    [formGroup]="serviceForm"
+    (ngSubmit)="onSubmit()"
+    class="grid grid-cols-2 gap-4"
+  >
+    @if (isEdit) {
+    <div>
+      <label class="block mb-1 text-sm font-medium">ID</label>
+      <input
+        formControlName="id"
+        class="w-full p-2 border rounded bg-gray-100"
+        readonly
+      />
+    </div>
+    }
+
+    <div>
+      <label class="block mb-1 text-sm font-medium">Fecha/Hora</label>
+      <span class="flex justify-between items-center">
+        <input
+          matInput
+          [matDatepicker]="picker"
+          [min]="minDate"
+          [matDatepickerFilter]="myFilter"
+          formControlName="date"
+          class="w-[40%] p-2 border rounded"
+        />
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="picker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <input
+          matInput
+          [matTimepicker]="pickerTime"
+          matTimepickerMin="08:30"
+          matTimepickerMax="17:30"
+          formControlName="time"
+          class="w-[40%] p-2 border rounded"
+        />
+        <mat-timepicker-toggle matIconSuffix [for]="pickerTime" />
+        <mat-timepicker #pickerTime />
+      </span>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-medium">Tipo de servicio</label>
+      <select formControlName="type" class="w-full p-2 border rounded">
+        <option value="Medición">Medición</option>
+        <option value="Transporte">Transporte</option>
+        <option value="Montaje">Montaje</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-medium">Estado</label>
+      <select formControlName="status" class="w-full p-2 border rounded">
+        @for (status of status; track $index) {
+          <option value="{{ status }}">{{ status }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-span-2">
+      <label class="block mb-1 text-sm font-medium">Descripción</label>
+      <textarea
+        class="input"
+        formControlName="description"
+        rows="2"
+        class="w-full p-2 border rounded"
+      ></textarea>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-medium">Operario</label>
+      <select formControlName="user" class="w-full p-2 border rounded">
+        @for (op of operatorNames |async; track $index) {
+          <option value="{{ op.firstName }} {{ op.lastName }}">{{ op.firstName }} {{ op.lastName }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-medium">Cliente</label>
+      <select formControlName="customer" class="w-full p-2 border rounded">
+        @for (customer of customerNames |async; track $index) {
+          <option value="{{ customer.firstName }} {{ customer.lastName }}">{{ customer.firstName }} {{ customer.lastName }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-span-2">
+      <label class="block mb-1 text-sm font-medium">Comentarios</label>
+      <textarea
+        class="input"
+        formControlName="comments"
+        rows="2"
+        class="w-full p-2 border rounded"
+      ></textarea>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-medium">
+        Archivos adjuntos
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+          class="bg-slate-200 cursor-pointer"
+          multiple
+          formControlName="sharedFiles"
+        />
+      </label>
+      <ul class="p-2 border rounded text-xs"> <!-- FALTA CARGAR Y ELIMINAR ARCHIVOS ADJUNTOS -->
+        @for (file of serviceForm.get('sharedFiles')?.value; track $index) {
+        <li
+          class="cursor-pointer hover:bg-slate-300 flex justify-between items-center" title="Click para descargar"
+        >
+          <a [href]="file.url" target="_blank">{{ file.name }}</a>
+          <button
+            type="button"
+            (click)="removeFile($index, 'sharedFiles')"
+            title="Eliminar"
+          >
+            🗑️
+          </button>
+        </li>
+        }
+      </ul>
+    </div>
+
+    <div>
+      <label class="block mb-1 text-sm font-medium"
+        >Añadidos por el operario</label
+      >
+      <ul class="p-2 border rounded text-xs"> <!-- FALTA CARGAR, ELIMINAR Y DOBLE CLICK ARCHIVOS OPERARIO -->
+        @for (file of serviceForm.get('operatorFiles')?.value; track $index) {
+        <li
+          class="cursor-pointer hover:bg-slate-300 flex justify-between items-center" title="Click para descargar"
+        >
+          <a [href]="file.url" target="_blank">{{ file.name }}</a>
+          <button
+            type="button"
+            (click)="removeFile($index, 'operatorFiles')"
+            title="Eliminar"
+          >
+            🗑️
+          </button>
+        </li>
+        }
+      </ul>
+    </div>
+
+    <div class="col-span-2 text-center mt-4">
+      <button
+        type="button"
+        [routerLink]="['/dashboard/services']"
+        class="bg-[#014455] text-white px-6 py-2 me-2 rounded hover:bg-[#013344]"
+      >
+        Volver
+      </button>
+      <button
+        type="submit"
+        class="bg-[#9dedce] text-[#014455] px-6 py-2 ms-2 rounded hover:bg-[#49717a] hover:text-[#9dedce]"
+      >
+        {{ isEdit ? "Actualizar Servicio" : "Crear Servicio" }}
+      </button>
+    </div>
+  </form>
+</section>

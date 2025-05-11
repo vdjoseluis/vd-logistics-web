@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject, OnInit } from '@angular/core';
+import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 
@@ -9,19 +9,22 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styles: ``
 })
-export default class LoginComponent {
-  private fb = inject(FormBuilder);
+export default class LoginComponent implements OnInit {
+  private db = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  error='';
+  form!: FormGroup;
+  error = '';
 
-  form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
-  });
+  ngOnInit(): void {
+    this.form = this.db.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+    });
+
+  }
 
   onLogin() {
     if (this.form.invalid) return;

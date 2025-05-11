@@ -3,7 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { UsersService } from '../../../services/users.service';
 import { User } from '../../../models/user.model';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-user-list',
@@ -13,7 +13,6 @@ import { Router, RouterLink } from '@angular/router';
 })
 export default class UserListComponent implements OnInit {
   private usersService = inject(UsersService);
-  private router = inject(Router);
   users: (User & { id: string })[] = [];
 
   currentPage = 1;
@@ -24,9 +23,5 @@ export default class UserListComponent implements OnInit {
       this.users = data;
       this.isLoading = false;
     });
-  }
-
-  goToEditUser(userId: string) {
-    this.router.navigate(['/dashboard/user', userId]);
   }
 }
