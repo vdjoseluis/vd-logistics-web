@@ -11,7 +11,7 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () => import('./auth/page/login.component'),
+    loadComponent: () => import('./auth/pages/login/login.component'),
     canActivate: [loginRedirectGuard]
   },
   {

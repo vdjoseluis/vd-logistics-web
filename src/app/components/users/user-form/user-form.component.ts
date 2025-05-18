@@ -1,36 +1,43 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { UsersService } from '../../../services/users.service';
 import { AuthService } from '../../../auth/services/auth.service';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { User } from '../../../models/user.model';
 import { CommonModule } from '@angular/common';
+import { User } from '../../../models/user.model';
+import { lastValueFrom } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './user-form.component.html',
+  imports: [ReactiveFormsModule, CommonModule, RouterLink, MatSnackBarModule],
 })
 export default class UserFormComponent implements OnInit {
-  private db = inject(FormBuilder);
-  private usersService = inject(UsersService);
+  private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private _snackBar = inject(MatSnackBar);
+  private usersService = inject(UsersService);
+  private dialog = inject(MatDialog);
+
 
   form!: FormGroup;
-  isEdit = false;
+  isEdit: boolean = false;
   userId: string = '';
 
   ngOnInit(): void {
-    this.form = this.db.group({
+    this.form = this.fb.group({
       id: [{ value: '', disabled: true }],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      phone: [''],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      phone: ['', [Validators.required, Validators.pattern("^[67]\\d{8}$")]],
+      email: ['', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       address: [''],
       type: ['Operario', Validators.required],
     });
@@ -47,7 +54,7 @@ export default class UserFormComponent implements OnInit {
             this.form.patchValue({
               id,
               ...user,
-            });
+            })
           } else {
             this.router.navigate(['/dashboard/users']);
           }
@@ -62,8 +69,7 @@ export default class UserFormComponent implements OnInit {
     if (this.form.invalid) return;
 
     const formValue = this.form.getRawValue();
-
-    const userData: Omit<User, 'id'> = {
+    const userData: Partial<User> = {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
       phone: formValue.phone,
@@ -74,15 +80,65 @@ export default class UserFormComponent implements OnInit {
 
     try {
       if (this.isEdit) {
-        await this.usersService.updateUser(this.userId, userData);
+        const response: any = await lastValueFrom(this.authService.updateUser(this.userId, userData));
+        if (response?.success) {
+          this.openSnackBar('✅ Usuario actualizado correctamente', '');
+          this.router.navigate(['/dashboard/users']);
+        } else {
+          this.openSnackBar('❌ Error actualizando usuario', '');
+        }
       } else {
-        const uid = await this.authService.createUserAuth(formValue.email, formValue.password);
-        await this.usersService.createUserWithId(uid, userData);
+        const response: any = await lastValueFrom(this.authService.createUser(userData, formValue.password));
+        if (response?.uid) {
+          this.userId = response.uid;
+          this.openSnackBar('✅ Usuario creado correctamente', ''); 
+          this.router.navigate(['/dashboard/users']);
+        } else if (response?.error) {
+          this.openSnackBar(`❌ ${response?.error}`, '');
+        }
       }
-
-      this.router.navigate(['/dashboard/users']);
     } catch (error) {
       console.error('Error guardando usuario:', error);
+      this.openSnackBar('❌ Error guardando usuario', '');
     }
+  }
+
+
+
+  async deleteUser() {
+    if (!this.userId) return;
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { message: '¿Estás seguro de que deseas eliminar este usuario?' }
+    });
+
+    const confirm = await lastValueFrom(dialogRef.afterClosed());
+
+    if (!confirm) return;
+
+    const currentUid = this.authService.getCurrentUserId();
+    if (this.userId === currentUid) {
+      await this.authService.logout();
+      this.router.navigate(['/login']); // ✅ Cierra sesión si es el usuario actual
+    }
+
+    try {
+      const response: any = await lastValueFrom(this.authService.deleteUser(this.userId));
+      if (response?.success) {
+        this.openSnackBar('✅ Usuario eliminado correctamente', '');
+        this.router.navigate(['/dashboard/users']);
+      } else {
+        this.openSnackBar('❌ Error eliminando usuario', '');
+      }
+    } catch (error) {
+      console.error('Error eliminando usuario:', error);
+      this.openSnackBar('❌ Error eliminando usuario', '');
+    }
+  }
+
+
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, { duration: 3000 });
   }
 }

@@ -2,6 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { routes } from '../../app.routes';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/services/auth.service';
+import { lastValueFrom } from 'rxjs';
+
+export interface UserExtended {
+  firstName: string;
+  lastName: string;
+}
 
 @Component({
   selector: 'app-sidemenu',
@@ -10,7 +16,7 @@ import { AuthService } from '../../auth/services/auth.service';
   templateUrl: './sidemenu.component.html',
 })
 export default class SidemenuComponent implements OnInit {
-  private auth = inject(AuthService);
+  private authService = inject(AuthService);
   private router = inject(Router);
 
   menuItems = routes
@@ -24,14 +30,17 @@ export default class SidemenuComponent implements OnInit {
   userName: string | null = null;
 
   async ngOnInit() {
-    const profile = await this.auth.getCurrentUserProfile();
-    this.firstName = profile?.['firstName'] ?? '';
-    this.lastName = profile?.['lastName'] ?? '';
-    this.userName = this.firstName?.charAt(0) + '. ' + this.lastName;
+  const uid = this.authService.getCurrentUserId();
+  if (uid) {
+    const profile = await lastValueFrom(this.authService.getUser(uid)); // ✅ Corrección
+    this.firstName = profile?.firstName ?? '';
+    this.lastName = profile?.lastName ?? '';
+    this.userName = `${this.firstName!.charAt(0)}. ${this.lastName}`;
   }
+}
 
   logout() {
-    this.auth.logout().then(() => {
+    this.authService.logout().then(() => {
       this.router.navigate(['/login']);
     });
   }

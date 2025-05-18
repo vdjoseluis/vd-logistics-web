@@ -9,14 +9,14 @@ import {
   docData,
   query,
   where,
+  deleteDoc,
 } from '@angular/fire/firestore';
 import { User } from '../models/user.model';
-import { Observable, from, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
   private db = inject(Firestore);
-  private usersCollection = collection(this.db, 'users');
 
   // 🔍 Obtener usuario por ID
   getUserById(id: string): Observable<User | undefined> {
@@ -25,15 +25,13 @@ export class UsersService {
   }
 
   // ➕ Crear nuevo usuario (ID generado automáticamente)
-  createUserWithId(uid: string, userData: Omit<User, 'id'>): Promise<void> {
-    const userRef = doc(this.db, `users/${uid}`);
-    return setDoc(userRef, userData);
+  async createUserWithId(uid: string, user: any): Promise<void> {
+    await setDoc(doc(this.db, `users/${uid}`), user);
   }
 
   // ✏️ Actualizar usuario existente
-  updateUser(id: string, user: Partial<User>): Promise<void> {
-    const userDocRef = doc(this.db, `users/${id}`);
-    return updateDoc(userDocRef, user);
+  async updateUser(uid: string, userData: Partial<User>): Promise<void> {
+    await updateDoc(doc(this.db, `users/${uid}`), userData);
   }
 
   // 🧾 Listar todos los usuarios
@@ -49,4 +47,8 @@ export class UsersService {
   }
 
   docRef = (id: string) => doc(this.db, `users/${id}`);
+
+  async deleteUser(uid: string): Promise<void> {
+    await deleteDoc(doc(this.db, `users/${uid}`));
+  }
 }

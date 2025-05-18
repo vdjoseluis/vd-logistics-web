@@ -1,42 +1,42 @@
-import { inject, Injectable, } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from '@angular/fire/auth';
-import { doc, getDoc, Firestore } from '@angular/fire/firestore';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Auth, signInWithEmailAndPassword, signOut, getAuth } from '@angular/fire/auth';
+import { User } from '../../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private auth = inject(Auth);
-  private firestore = inject(Firestore);
+  private apiUrl = 'http://localhost:5000';
 
-  async getCurrentUserProfile() {
-    const user = this.auth.currentUser;
-    if (!user) return null;
+  constructor(private http: HttpClient) { }
 
-    const userDoc = doc(this.firestore, 'users', user.uid);
-    const snap = await getDoc(userDoc);
-    return snap.exists() ? snap.data() : null;
+  createUser(userData: Partial<User>, password: string) {
+    return this.http.post<{ uid: string }>(`${this.apiUrl}/createUser`, { userData, password });
   }
 
-  login(email: string, password: string) {
-    return signInWithEmailAndPassword(this.auth, email, password);
-  }
-  logout() {
-    return signOut(this.auth);
+  updateUser(uid: string, userData: Partial<User>) {
+    return this.http.put<{ success: boolean }>(`${this.apiUrl}/updateUser/${uid}`, { userData });
   }
 
-  getUserState(): Promise<boolean> {
-    return new Promise(resolve => {
-      const unsub = onAuthStateChanged(this.auth, user => {
-        unsub();
-        resolve(!!user);
-      });
-    });
+  deleteUser(uid: string) {
+    return this.http.delete<{ success: boolean }>(`${this.apiUrl}/deleteUser/${uid}`);
   }
 
-  createUserAuth(email: string, password: string): Promise<string> {
-    return createUserWithEmailAndPassword(this.auth, email, password).then((userCredential) => {
-      return userCredential.user.uid;
-    });
+  async login(email: string, password: string): Promise<void> {
+    await signInWithEmailAndPassword(getAuth(), email, password);
+  }
+
+  async logout(): Promise<void> {
+    await signOut(getAuth());
+  }
+
+  getCurrentUserId(): string | null {
+    const user = getAuth().currentUser;
+    return user ? user.uid : null;
+  }
+
+  getUser(uid: string) {
+    return this.http.get<User>(`${this.apiUrl}/getUser/${uid}`);
   }
 }

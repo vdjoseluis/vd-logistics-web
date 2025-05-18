@@ -1,10 +1,12 @@
-<section class="max-w-4xl mx-auto p-6 mt-6 bg-slate-100 shadow-2xl rounded-xl shadow-slate-500">
+<section
+  class="max-w-4xl mx-auto p-6 mt-6 bg-slate-100 shadow-2xl rounded-xl shadow-slate-500"
+>
   <h2 class="text-2xl font-bold tracking-widest mb-6 text-center">
     {{ isEdit ? "Editar Usuario" : "Nuevo Usuario" }}
   </h2>
 
   <form
-    [formGroup] = "form"
+    [formGroup]="form"
     (ngSubmit)="onSubmit()"
     class="grid grid-cols-2 gap-4"
   >
@@ -32,8 +34,12 @@
     <div>
       <label class="block mb-1 text-sm font-medium">Teléfono</label>
       <input formControlName="phone" class="w-full p-2 border rounded" />
+      @if (form.controls['phone'].invalid && form.controls['phone'].touched) {
+      <span class="text-red-600">Telefono válido requerido</span>
+      }
     </div>
 
+    @if (!isEdit) {
     <div>
       <label class="block mb-1 text-sm font-medium">Email</label>
       <input
@@ -41,9 +47,11 @@
         formControlName="email"
         class="w-full p-2 border rounded"
       />
+      @if (form.controls['email'].invalid && form.controls['email'].touched) {
+      <span class="text-red-600">Email válido requerido</span>
+      }
     </div>
 
-    @if (!isEdit) {
     <div>
       <label class="block mb-1 text-sm font-medium">Contraseña</label>
       <input
@@ -51,6 +59,9 @@
         formControlName="password"
         class="w-full p-2 border rounded"
       />
+      @if (form.controls['password'].invalid && form.controls['password'].touched) {
+      <span class="text-red-600">Contraseña válida requerida (min 6 caracteres)</span>
+      }
     </div>
     }
 
@@ -75,6 +86,14 @@
       >
         Volver
       </button>
+      @if (isEdit) {
+      <button
+        class="bg-red-900 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+        (click)="deleteUser()" type="button"
+      >
+        Eliminar Usuario
+      </button>
+      }
       <button
         type="submit"
         class="bg-[#9dedce] text-[#014455] px-6 py-2 ms-2 rounded hover:bg-[#49717a] hover:text-[#9dedce]"
