@@ -9,6 +9,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { Observable, first } from 'rxjs';
+import { Customer } from '../../../models/customer.model';
 
 @Component({
   selector: 'app-service-form',
@@ -34,7 +35,7 @@ export default class ServiceFormComponent implements OnInit {
   status = ['Pendiente', 'Confirmado', 'Finalizado', 'Propuesta nueva fecha', 'Pendiente Finalización', 'Incidencia'];
   serviceId: string = '';
   operatorNames = new Observable<{ id: string; firstName: string; lastName: string }[]>();
-  customerNames = new Observable<{ id: string; firstName: string; lastName: string }[]>();
+  customerNames = new Observable<Partial<Customer>[]>();
 
   ngOnInit(): void {
     this.operatorNames = this.usersService.getUsersByType('Operario');

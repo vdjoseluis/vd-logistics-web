@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, signOut, getAuth } from '@angular/fire/auth';
+import { signInWithEmailAndPassword, signOut, getAuth } from '@angular/fire/auth';
 import { User } from '../../models/user.model';
 
 @Injectable({

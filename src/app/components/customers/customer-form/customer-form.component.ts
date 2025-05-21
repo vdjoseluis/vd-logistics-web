@@ -4,6 +4,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CustomersService } from '../../../services/customers.service';
 import { Customer } from '../../../models/customer.model';
+import { GoogleAddressService } from '../../../services/google-address.service';
+import { lastValueFrom } from 'rxjs';
+import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-customer-form',
@@ -16,6 +21,10 @@ export default class CustomerFormComponent implements OnInit {
   private customersService = inject(CustomersService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private googleAddressService = inject(GoogleAddressService);
+  private dialog = inject(MatDialog);
+    private _snackBar = inject(MatSnackBar);
+
 
   form!: FormGroup;
   isEdit = false;
@@ -26,9 +35,9 @@ export default class CustomerFormComponent implements OnInit {
       id: [{ value: '', disabled: true }],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      phone: [''],  //TODO: Agregar validacion telefono
-      email: ['', [Validators.required, Validators.email]],
-      address: ['', Validators.required], //TODO: Agregar validacion direccion
+      phone: ['', [Validators.required, Validators.pattern("^[67]\\d{8}$")]],
+      email: ['', [Validators.required, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
+      address: ['', Validators.required],
       addressAdditional: [''],
     });
 
@@ -45,7 +54,7 @@ export default class CustomerFormComponent implements OnInit {
               ...customer,
             });
           } else {
-            this.router.navigate(['customers']);
+            this.router.navigate(['/dashboard/customers']);
           }
         });
       } else {
@@ -58,7 +67,6 @@ export default class CustomerFormComponent implements OnInit {
     if (this.form.invalid) return;
 
     const formValue = this.form.getRawValue();
-
     const customerData: Omit<Customer, 'id'> = {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
@@ -69,15 +77,64 @@ export default class CustomerFormComponent implements OnInit {
     };
 
     try {
-      if (this.isEdit) {
-        await this.customersService.updateCustomer(this.customerId, customerData);
-      } else {
-        await this.customersService.createCustomer(customerData);
+      // ✅ Validar dirección si es un NUEVO cliente o si la dirección cambió en edición
+      if (!this.isEdit || this.form.get('address')?.dirty) {
+        const geocodedData = await this.googleAddressService.geocodeAddress(customerData.address!);
+
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+          data: { message: `Google sugiere: ${geocodedData.formattedAddress}. ¿Quieres usar esta dirección?` }
+        });
+
+        const confirm = await lastValueFrom(dialogRef.afterClosed());
+        if (!confirm) return;
+
+        customerData.address = geocodedData.formattedAddress;
+        customerData.city = geocodedData.city || '';
       }
 
-      this.router.navigate(['/dashboard/customers']);
+      let response;
+      if (this.isEdit) {
+        response = await lastValueFrom(this.customersService.updateCustomer(this.customerId, customerData));
+      } else {
+        response = await lastValueFrom(this.customersService.createCustomer(customerData));
+      }
+
+      if (response?.success) {
+        this.router.navigate(['/dashboard/customers']);
+      } else {
+        console.error('⚠️ Error guardando cliente:', response);
+      }
     } catch (error) {
-      console.error('Error guardando cliente:', error);
+      console.error('❌ Error en la solicitud:', error);
     }
+  }
+
+  async deleteCustomer() {
+    if (!this.customerId) return;
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { message: '¿Seguro que quieres eliminar este cliente?' }
+    });
+
+    const confirm = await lastValueFrom(dialogRef.afterClosed());
+
+    if (!confirm) return;
+
+    try {
+      const response = await lastValueFrom(this.customersService.deleteCustomer(this.customerId));
+      if (response?.success) {
+        this.openSnackBar('✅ Cliente eliminado correctamente', '');
+        this.router.navigate(['/dashboard/customers']);
+      } else {
+        this.openSnackBar('❌ Error eliminando cliente', '');
+      }
+    } catch (error) {
+      console.error('❌ Error en la solicitud:', error);
+      this.openSnackBar('❌ Error eliminando cliente', '');
+    }
+  }
+
+  openSnackBar(message: string, action: string) {
+    this._snackBar.open(message, action, { duration: 3000 });
   }
 }

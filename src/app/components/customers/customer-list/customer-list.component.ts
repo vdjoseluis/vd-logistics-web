@@ -13,7 +13,7 @@ import { RouterLink } from '@angular/router';
 })
 export default class CustomerListComponent implements OnInit {
   private customersService = inject(CustomersService);
-  customers: (Customer & { id: string })[] = [];
+  customers : Partial<Customer>[] = [];
 
   currentPage = 1;
   isLoading = true;

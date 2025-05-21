@@ -91,7 +91,7 @@ export default class UserFormComponent implements OnInit {
         const response: any = await lastValueFrom(this.authService.createUser(userData, formValue.password));
         if (response?.uid) {
           this.userId = response.uid;
-          this.openSnackBar('✅ Usuario creado correctamente', ''); 
+          this.openSnackBar('✅ Usuario creado correctamente', '');
           this.router.navigate(['/dashboard/users']);
         } else if (response?.error) {
           this.openSnackBar(`❌ ${response?.error}`, '');
@@ -135,8 +135,6 @@ export default class UserFormComponent implements OnInit {
       this.openSnackBar('❌ Error eliminando usuario', '');
     }
   }
-
-
 
   openSnackBar(message: string, action: string) {
     this._snackBar.open(message, action, { duration: 3000 });

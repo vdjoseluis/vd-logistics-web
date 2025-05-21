@@ -1,3 +1,5 @@
+import { GeoPoint } from "firebase/firestore";
+
 export interface Customer {
   id?: string;
   firstName: string;

@@ -1,39 +1,45 @@
 import { inject, Injectable } from '@angular/core';
-import { collectionData, docData, Firestore } from '@angular/fire/firestore';
-import { collection, doc, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { collectionData, Firestore } from '@angular/fire/firestore';
+import { collection } from 'firebase/firestore';
 import { Observable } from 'rxjs';
 import { Customer } from '../models/customer.model';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomersService {
   private db = inject(Firestore);
-  private customersCollection = collection(this.db, 'customers');
+  private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:5000';
 
-  getAllCustomers(): Observable<(Customer & {id:string})[]> {
+  // 🔍 Obtener todos los clientes desde el backend
+  getAllCustomers(): Observable<Partial<Customer>[]> {
     const customersRef = collection(this.db, 'customers');
-    return collectionData(customersRef, { idField: 'id' }) as Observable<(Customer & { id: string })[]>;
+    return collectionData(customersRef, { idField: 'id' }) as Observable<Partial<Customer>[]>;
   }
 
-  // 🔍 Obtener cliente por ID
-    getCustomerById(id: string): Observable<Customer | undefined> {
-      const customerDocRef = doc(this.db, `customers/${id}`);
-      return docData(customerDocRef, { idField: 'id' }) as Observable<Customer>;
-    }
+  // 🔍 Obtener cliente por ID desde el backend
+  getCustomerById(id: string): Observable<Customer> {
+    return this.http.get<Customer>(`${this.apiUrl}/getCustomer/${id}`);
+  }
 
-    // ➕ Crear nuevo cliente (ID generado automáticamente)
-    createCustomer(customerData: Omit<Customer, 'id'>): Promise<void> {
-      const customerRef = doc(this.db, 'customers');
-      return setDoc(customerRef, customerData);
-    }
+  // ➕ Crear nuevo cliente en el backend
+  createCustomer(customerData: Omit<Customer, 'id'>): Observable<{ success: boolean; id: string }> {
+    return this.http.post<{ success: boolean; id: string }>(`${this.apiUrl}/createCustomer`, {
+      ...customerData
+    });
+  }
 
-    // ✏️ Actualizar cliente existente
-    updateCustomer(id: string, customer: Partial<Customer>): Promise<void> {
-      const customerDocRef = doc(this.db, `customers/${id}`);
-      return updateDoc(customerDocRef, customer);
-    }
+  // ✏️ Actualizar cliente existente en el backend
+  updateCustomer(id: string, customerData: Partial<Customer>): Observable<{ success: boolean }> {
+    return this.http.put<{ success: boolean }>(`${this.apiUrl}/updateCustomer/${id}`, {
+      ...customerData
+    });
+  }
 
-    docRef = (id: string) => doc(this.db, `customers/${id}`)
-
+  // 🗑️ Eliminar cliente en el backend
+  deleteCustomer(id: string): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.apiUrl}/deleteCustomer/${id}`);
+  }
 }
